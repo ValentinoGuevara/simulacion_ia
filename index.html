@@ -1,0 +1,1285 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador de Ejercicio y Salud</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #4f46e5;
+            --primary-dark: #4338ca;
+            --secondary: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --bg-light: #f9fafb;
+            --bg-dark: #1f2937;
+            --text-dark: #111827;
+            --text-light: #6b7280;
+            --border: #e5e7eb;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: var(--text-dark);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .tabs {
+            display: flex;
+            background: var(--bg-light);
+            border-bottom: 2px solid var(--border);
+            overflow-x: auto;
+        }
+
+        .tab {
+            padding: 15px 30px;
+            cursor: pointer;
+            border: none;
+            background: transparent;
+            font-size: 1em;
+            font-weight: 600;
+            color: var(--text-light);
+            transition: all 0.3s;
+            border-bottom: 3px solid transparent;
+            white-space: nowrap;
+        }
+
+        .tab:hover {
+            background: white;
+            color: var(--primary);
+        }
+
+        .tab.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+            background: white;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text-dark);
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            font-size: 1em;
+            transition: all 0.3s;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-right: 10px;
+            margin-top: 10px;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(79, 70, 229, 0.3);
+        }
+
+        .btn-secondary {
+            background: var(--secondary);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #059669;
+            transform: translateY(-2px);
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+
+        .card {
+            background: var(--bg-light);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            border: 2px solid var(--border);
+        }
+
+        .card h3 {
+            margin-bottom: 15px;
+            color: var(--primary);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            border: 2px solid var(--border);
+            transition: all 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-value {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: var(--primary);
+            margin: 10px 0;
+        }
+
+        .stat-label {
+            color: var(--text-light);
+            font-size: 0.9em;
+        }
+
+        .exercise-list {
+            display: grid;
+            gap: 15px;
+        }
+
+        .exercise-item {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid var(--primary);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .exercise-info h4 {
+            color: var(--text-dark);
+            margin-bottom: 5px;
+        }
+
+        .exercise-details {
+            color: var(--text-light);
+            font-size: 0.9em;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin-top: 20px;
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .alert-success {
+            background: #d1fae5;
+            color: #065f46;
+            border: 2px solid #10b981;
+        }
+
+        .alert-info {
+            background: #dbeafe;
+            color: #1e40af;
+            border: 2px solid #3b82f6;
+        }
+
+        .alert-warning {
+            background: #fef3c7;
+            color: #92400e;
+            border: 2px solid #f59e0b;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 30px;
+            background: var(--bg-light);
+            border-radius: 15px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--secondary) 0%, var(--primary) 100%);
+            transition: width 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+        }
+
+        .diary-entry {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border-left: 4px solid var(--secondary);
+        }
+
+        .diary-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .diary-date {
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .nutrition-tip {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            border-left: 4px solid var(--warning);
+        }
+
+        .nutrition-tip h4 {
+            color: var(--text-dark);
+            margin-bottom: 10px;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .imc-indicator {
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+
+        .imc-bajo { background: #dbeafe; color: #1e40af; }
+        .imc-normal { background: #d1fae5; color: #065f46; }
+        .imc-sobrepeso { background: #fef3c7; color: #92400e; }
+        .imc-obesidad { background: #fee2e2; color: #991b1b; }
+
+        @media (max-width: 768px) {
+            header h1 { font-size: 1.8em; }
+            .stats-grid { grid-template-columns: 1fr; }
+            .tab { padding: 12px 20px; font-size: 0.9em; }
+            .content { padding: 20px; }
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🏋️ Simulador de Ejercicio y Salud</h1>
+            <p>Tu compañero personal para alcanzar tus metas de salud y bienestar</p>
+            <p style="font-size: 0.9em; opacity: 0.8; margin-top: 10px;">✨ Cargado con datos de ejemplo para que explores todas las funcionalidades</p>
+        </header>
+
+        <div class="tabs">
+            <button class="tab active" onclick="showTab('perfil')">📋 Perfil</button>
+            <button class="tab" onclick="showTab('rutina')">💪 Rutina</button>
+            <button class="tab" onclick="showTab('diario')">📝 Diario</button>
+            <button class="tab" onclick="showTab('nutricion')">🥗 Nutrición</button>
+            <button class="tab" onclick="showTab('resumen')">📈 Resumen</button>
+        </div>
+
+        <div class="content">
+            <!-- TAB: PERFIL -->
+            <div id="perfil" class="tab-content active">
+                <div class="card">
+                    <h3>Información Personal</h3>
+                    <div class="grid-2">
+                        <div class="form-group">
+                            <label>Edad</label>
+                            <input type="number" id="edad" placeholder="Ej: 25" min="10" max="100">
+                        </div>
+                        <div class="form-group">
+                            <label>Sexo</label>
+                            <select id="sexo">
+                                <option value="">Seleccionar</option>
+                                <option value="masculino">Masculino</option>
+                                <option value="femenino">Femenino</option>
+                                <option value="otro">Otro</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Peso (kg)</label>
+                            <input type="number" id="peso" placeholder="Ej: 70" min="30" max="300" step="0.1">
+                        </div>
+                        <div class="form-group">
+                            <label>Altura (cm)</label>
+                            <input type="number" id="altura" placeholder="Ej: 170" min="100" max="250">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Nivel de Actividad Actual</label>
+                        <select id="nivelActividad">
+                            <option value="">Seleccionar</option>
+                            <option value="sedentario">Sedentario (poco o ningún ejercicio)</option>
+                            <option value="moderado">Moderadamente activo (ejercicio 3-5 días/semana)</option>
+                            <option value="activo">Muy activo (ejercicio 6-7 días/semana)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Objetivo de Salud</label>
+                        <select id="objetivo">
+                            <option value="">Seleccionar</option>
+                            <option value="perder">Pérdida de peso</option>
+                            <option value="ganar">Ganancia muscular</option>
+                            <option value="resistencia">Aumentar resistencia</option>
+                            <option value="flexibilidad">Mejorar flexibilidad</option>
+                            <option value="tonificar">Tonificar cuerpo</option>
+                            <option value="mantener">Mantener salud general</option>
+                        </select>
+                    </div>
+
+                    <button class="btn btn-primary" onclick="guardarPerfil()">💾 Guardar Perfil</button>
+                    <button class="btn btn-danger" onclick="limpiarDatosEjemplo()">🗑️ Limpiar Datos de Ejemplo</button>
+                    <div id="imcResultado" class="hidden"></div>
+                </div>
+            </div>
+
+            <!-- TAB: RUTINA -->
+            <div id="rutina" class="tab-content">
+                <div class="card">
+                    <h3>Generar Rutina Personalizada</h3>
+                    
+                    <div class="grid-2">
+                        <div class="form-group">
+                            <label>Frecuencia (días/semana)</label>
+                            <input type="number" id="frecuencia" placeholder="Ej: 4" min="1" max="7">
+                        </div>
+                        <div class="form-group">
+                            <label>Duración por sesión (minutos)</label>
+                            <input type="number" id="duracion" placeholder="Ej: 45" min="15" max="180">
+                        </div>
+                        <div class="form-group">
+                            <label>Nivel de Dificultad</label>
+                            <select id="dificultad">
+                                <option value="facil">Fácil</option>
+                                <option value="medio">Medio</option>
+                                <option value="dificil">Difícil</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Tipo de Ejercicio Preferido</label>
+                            <select id="tipoEjercicio">
+                                <option value="mixto">Mixto (Recomendado)</option>
+                                <option value="cardio">Cardio</option>
+                                <option value="fuerza">Fuerza</option>
+                                <option value="flexibilidad">Flexibilidad</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <button class="btn btn-primary" onclick="generarRutina()">🎯 Generar Rutina</button>
+                </div>
+
+                <div id="rutinaGenerada" class="hidden">
+                    <div class="card">
+                        <h3>Tu Rutina Personalizada</h3>
+                        <div id="listaEjercicios" class="exercise-list"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB: DIARIO -->
+            <div id="diario" class="tab-content">
+                <div class="alert alert-info">
+                    <strong>📝 Diario de Entrenamientos</strong>
+                    <p>El historial muestra entrenamientos de ejemplo. Puedes agregar tus propios entrenamientos usando el formulario.</p>
+                </div>
+
+                <div class="card">
+                    <h3>Registrar Entrenamiento</h3>
+                    
+                    <div class="form-group">
+                        <label>Tipo de Ejercicio</label>
+                        <select id="diarioTipo">
+                            <option value="cardio">Cardio</option>
+                            <option value="fuerza">Fuerza</option>
+                            <option value="flexibilidad">Flexibilidad</option>
+                            <option value="mixto">Mixto</option>
+                        </select>
+                    </div>
+
+                    <div class="grid-2">
+                        <div class="form-group">
+                            <label>Duración (minutos)</label>
+                            <input type="number" id="diarioDuracion" placeholder="Ej: 45" min="5">
+                        </div>
+                        <div class="form-group">
+                            <label>Intensidad</label>
+                            <select id="diarioIntensidad">
+                                <option value="baja">Baja</option>
+                                <option value="media">Media</option>
+                                <option value="alta">Alta</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>¿Cómo te sentiste?</label>
+                        <textarea id="diarioNotas" rows="3" placeholder="Describe cómo te sentiste durante y después del ejercicio..."></textarea>
+                    </div>
+
+                    <button class="btn btn-secondary" onclick="registrarEntrenamiento()">✅ Registrar Entrenamiento</button>
+                </div>
+
+                <div class="card">
+                    <h3>Historial de Entrenamientos</h3>
+                    <div id="historialEntrenamientos"></div>
+                </div>
+            </div>
+
+            <!-- TAB: NUTRICIÓN -->
+            <div id="nutricion" class="tab-content">
+                <div class="nutrition-tip">
+                    <h4>💡 Consejo del Día</h4>
+                    <p id="consejoNutricion"></p>
+                </div>
+
+                <div class="card">
+                    <h3>Recomendaciones Nutricionales</h3>
+                    <div id="recomendacionesNutricionales"></div>
+                </div>
+
+                <div class="card">
+                    <h3>Plan de Hidratación</h3>
+                    <p>Basado en tu peso y nivel de actividad:</p>
+                    <div class="stat-card" style="margin-top: 15px;">
+                        <div class="stat-label">Agua Recomendada Diaria</div>
+                        <div class="stat-value" id="aguaDiaria">--</div>
+                        <div class="stat-label">litros</div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>Alimentos Recomendados según tu Objetivo</h3>
+                    <div id="alimentosRecomendados"></div>
+                </div>
+            </div>
+
+            <!-- TAB: RESUMEN -->
+            <div id="resumen" class="tab-content">
+                <div class="alert alert-info">
+                    <strong>📅 Resumen General</strong>
+                    <p>Aquí puedes ver un resumen completo de tu progreso y actividad</p>
+                </div>
+
+                <div class="card">
+                    <h3>Resumen Semanal</h3>
+                    <div id="resumenSemanal"></div>
+                </div>
+
+                <div class="card">
+                    <h3>Objetivos y Logros</h3>
+                    <div id="objetivosLogros"></div>
+                </div>
+
+                <div class="card">
+                    <h3>Recomendaciones para Mejorar</h3>
+                    <div id="recomendacionesMejora"></div>
+                </div>
+
+                <div class="card">
+                    <h3>Ajustar Metas</h3>
+                    <div class="form-group">
+                        <label>Nuevo Objetivo</label>
+                        <select id="nuevoObjetivo">
+                            <option value="">Mantener objetivo actual</option>
+                            <option value="perder">Pérdida de peso</option>
+                            <option value="ganar">Ganancia muscular</option>
+                            <option value="resistencia">Aumentar resistencia</option>
+                            <option value="flexibilidad">Mejorar flexibilidad</option>
+                            <option value="tonificar">Tonificar cuerpo</option>
+                            <option value="mantener">Mantener salud general</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-primary" onclick="ajustarObjetivo()">🎯 Actualizar Objetivo</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Estado de la aplicación (datos en memoria)
+        let appData = {
+            perfil: {
+                edad: 25,
+                sexo: 'masculino',
+                peso: 70,
+                altura: 170,
+                nivelActividad: 'moderado',
+                objetivo: 'tonificar'
+            },
+            rutina: {
+                frecuencia: 4,
+                duracion: 45,
+                dificultad: 'medio',
+                tipo: 'mixto',
+                ejercicios: []
+            },
+            progreso: {
+                historialPeso: [
+                    { fecha: '01/10/2024', peso: 72 },
+                    { fecha: '08/10/2024', peso: 71.5 },
+                    { fecha: '15/10/2024', peso: 71 },
+                    { fecha: '22/10/2024', peso: 70.5 },
+                    { fecha: '29/10/2024', peso: 70.2 },
+                    { fecha: '05/11/2024', peso: 70 }
+                ],
+                entrenamientos: [
+                    { fecha: '01/11/2024', hora: '07:30', tipo: 'cardio', duracion: 30, intensidad: 'media', notas: 'Buena sesión de trote matutino', calorias: 150 },
+                    { fecha: '02/11/2024', hora: '18:00', tipo: 'fuerza', duracion: 45, intensidad: 'alta', notas: 'Rutina de pesas completa', calorias: 360 },
+                    { fecha: '03/11/2024', hora: '08:00', tipo: 'cardio', duracion: 40, intensidad: 'alta', notas: 'Intervalos de alta intensidad', calorias: 320 },
+                    { fecha: '04/11/2024', hora: '19:00', tipo: 'flexibilidad', duracion: 30, intensidad: 'baja', notas: 'Yoga relajante', calorias: 90 },
+                    { fecha: '05/11/2024', hora: '07:00', tipo: 'fuerza', duracion: 50, intensidad: 'alta', notas: 'Día de piernas intenso', calorias: 400 },
+                    { fecha: '05/11/2024', hora: '18:30', tipo: 'cardio', duracion: 25, intensidad: 'media', notas: 'Ciclismo ligero', calorias: 125 },
+                    { fecha: '04/11/2024', hora: '12:00', tipo: 'mixto', duracion: 60, intensidad: 'media', notas: 'Entrenamiento funcional', calorias: 300 }
+                ],
+                totalCalorias: 1745
+            }
+        };
+
+        // Base de datos de ejercicios
+        const ejerciciosDB = {
+            cardio: {
+                facil: [
+                    { nombre: 'Caminata rápida', duracion: 30, calorias: 150, descripcion: '30 min a ritmo moderado' },
+                    { nombre: 'Bicicleta estática', duracion: 25, calorias: 180, descripcion: '25 min a intensidad baja-media' },
+                    { nombre: 'Natación suave', duracion: 20, calorias: 200, descripcion: '20 min estilo libre suave' },
+                    { nombre: 'Elíptica', duracion: 20, calorias: 170, descripcion: '20 min a ritmo constante' }
+                ],
+                medio: [
+                    { nombre: 'Trote', duracion: 30, calorias: 300, descripcion: '30 min a ritmo moderado' },
+                    { nombre: 'Ciclismo', duracion: 40, calorias: 350, descripcion: '40 min en terreno variado' },
+                    { nombre: 'Natación intervalos', duracion: 30, calorias: 350, descripcion: '30 min con intervalos de intensidad' },
+                    { nombre: 'HIIT básico', duracion: 20, calorias: 280, descripcion: '20 min de intervalos de alta intensidad' }
+                ],
+                dificil: [
+                    { nombre: 'Carrera intensa', duracion: 45, calorias: 500, descripcion: '45 min a ritmo rápido' },
+                    { nombre: 'Spinning avanzado', duracion: 50, calorias: 550, descripcion: '50 min con alta resistencia' },
+                    { nombre: 'Natación competitiva', duracion: 45, calorias: 600, descripcion: '45 min a alta intensidad' },
+                    { nombre: 'HIIT avanzado', duracion: 30, calorias: 450, descripcion: '30 min de intervalos extremos' }
+                ]
+            },
+            fuerza: {
+                facil: [
+                    { nombre: 'Flexiones (rodillas)', duracion: 15, calorias: 80, descripcion: '3 series de 10 repeticiones' },
+                    { nombre: 'Sentadillas básicas', duracion: 15, calorias: 90, descripcion: '3 series de 12 repeticiones' },
+                    { nombre: 'Plancha', duracion: 10, calorias: 50, descripcion: '3 series de 20 segundos' },
+                    { nombre: 'Peso muerto con mancuernas ligeras', duracion: 20, calorias: 100, descripcion: '3 series de 10 repeticiones' }
+                ],
+                medio: [
+                    { nombre: 'Flexiones completas', duracion: 20, calorias: 120, descripcion: '4 series de 15 repeticiones' },
+                    { nombre: 'Sentadillas con peso', duracion: 25, calorias: 150, descripcion: '4 series de 12 repeticiones' },
+                    { nombre: 'Press de banca', duracion: 30, calorias: 180, descripcion: '4 series de 10 repeticiones' },
+                    { nombre: 'Dominadas asistidas', duracion: 20, calorias: 140, descripcion: '4 series de 8 repeticiones' }
+                ],
+                dificil: [
+                    { nombre: 'Dominadas completas', duracion: 25, calorias: 200, descripcion: '5 series de 10 repeticiones' },
+                    { nombre: 'Sentadillas pesadas', duracion: 35, calorias: 250, descripcion: '5 series de 8 repeticiones' },
+                    { nombre: 'Press militar', duracion: 30, calorias: 220, descripcion: '5 series de 8 repeticiones' },
+                    { nombre: 'Peso muerto pesado', duracion: 35, calorias: 280, descripcion: '5 series de 6 repeticiones' }
+                ]
+            },
+            flexibilidad: {
+                facil: [
+                    { nombre: 'Yoga básico', duracion: 30, calorias: 100, descripcion: 'Posturas básicas de yoga' },
+                    { nombre: 'Estiramientos estáticos', duracion: 20, calorias: 60, descripcion: 'Rutina completa de estiramientos' },
+                    { nombre: 'Movilidad articular', duracion: 15, calorias: 50, descripcion: 'Ejercicios de movilidad' },
+                    { nombre: 'Pilates suave', duracion: 25, calorias: 90, descripcion: 'Pilates para principiantes' }
+                ],
+                medio: [
+                    { nombre: 'Yoga intermedio', duracion: 45, calorias: 150, descripcion: 'Vinyasa flow' },
+                    { nombre: 'Pilates intermedio', duracion: 40, calorias: 140, descripcion: 'Pilates mat work' },
+                    { nombre: 'Estiramientos dinámicos', duracion: 30, calorias: 100, descripcion: 'Estiramientos activos' },
+                    { nombre: 'Tai Chi', duracion: 35, calorias: 120, descripcion: 'Secuencia completa' }
+                ],
+                dificil: [
+                    { nombre: 'Yoga avanzado', duracion: 60, calorias: 200, descripcion: 'Ashtanga o power yoga' },
+                    { nombre: 'Pilates avanzado', duracion: 50, calorias: 180, descripcion: 'Con equipamiento' },
+                    { nombre: 'Contorsionismo', duracion: 45, calorias: 160, descripcion: 'Flexibilidad extrema' },
+                    { nombre: 'Acro yoga', duracion: 50, calorias: 220, descripcion: 'Yoga acrobático' }
+                ]
+            }
+        };
+
+        // Consejos de nutrición
+        const consejosNutricion = [
+            'La hidratación es clave: bebe al menos 8 vasos de agua al día.',
+            'Las proteínas ayudan a reparar y construir músculo. Incluye fuentes de proteína en cada comida.',
+            'Los carbohidratos complejos te dan energía sostenida. Opta por granos integrales.',
+            'Las grasas saludables son esenciales. Incluye aguacate, frutos secos y aceite de oliva.',
+            'Come 5 porciones de frutas y verduras al día para obtener vitaminas y minerales.',
+            'El descanso es tan importante como el ejercicio. Duerme 7-9 horas cada noche.',
+            'Evita los azúcares refinados y alimentos procesados.',
+            'Planifica tus comidas para evitar decisiones impulsivas poco saludables.',
+            'No te saltes el desayuno, es el combustible para tu día.',
+            'Come lento y disfruta tus alimentos para mejor digestión y saciedad.'
+        ];
+
+        // Función para mostrar tabs
+        function showTab(tabName) {
+            // Ocultar todos los tabs
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+
+            // Mostrar tab seleccionado
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+
+            // Actualizar datos según el tab
+            if (tabName === 'nutricion') {
+                actualizarNutricion();
+            } else if (tabName === 'resumen') {
+                actualizarResumen();
+            } else if (tabName === 'diario') {
+                mostrarHistorialEntrenamientos();
+            }
+        }
+
+        // Guardar perfil
+        function guardarPerfil() {
+            const edad = parseInt(document.getElementById('edad').value);
+            const sexo = document.getElementById('sexo').value;
+            const peso = parseFloat(document.getElementById('peso').value);
+            const altura = parseFloat(document.getElementById('altura').value);
+            const nivelActividad = document.getElementById('nivelActividad').value;
+            const objetivo = document.getElementById('objetivo').value;
+
+            if (!edad || !sexo || !peso || !altura || !nivelActividad || !objetivo) {
+                alert('Por favor, completa todos los campos');
+                return;
+            }
+
+            appData.perfil = { edad, sexo, peso, altura, nivelActividad, objetivo };
+
+            // Calcular IMC
+            const imc = calcularIMC(peso, altura);
+            const clasificacion = clasificarIMC(imc);
+
+            // Guardar peso inicial si es el primero
+            if (appData.progreso.historialPeso.length === 0) {
+                appData.progreso.historialPeso.push({
+                    fecha: new Date().toLocaleDateString(),
+                    peso: peso
+                });
+            }
+
+            // Mostrar resultado
+            const resultadoDiv = document.getElementById('imcResultado');
+            resultadoDiv.className = `card imc-${clasificacion.clase}`;
+            resultadoDiv.innerHTML = `
+                <h3>✅ Perfil Guardado</h3>
+                <p><strong>Tu IMC:</strong> ${imc}</p>
+                <p><strong>Clasificación:</strong> ${clasificacion.texto}</p>
+                <p><strong>Objetivo:</strong> ${obtenerTextoObjetivo(objetivo)}</p>
+            `;
+            resultadoDiv.classList.remove('hidden');
+
+            alert('✅ Perfil guardado exitosamente');
+        }
+
+        function calcularIMC(peso, altura) {
+            const alturaMetros = altura / 100;
+            return (peso / (alturaMetros * alturaMetros)).toFixed(1);
+        }
+
+        function clasificarIMC(imc) {
+            if (imc < 18.5) return { clase: 'bajo', texto: 'Bajo peso' };
+            if (imc < 25) return { clase: 'normal', texto: 'Peso normal' };
+            if (imc < 30) return { clase: 'sobrepeso', texto: 'Sobrepeso' };
+            return { clase: 'obesidad', texto: 'Obesidad' };
+        }
+
+        function obtenerTextoObjetivo(objetivo) {
+            const objetivos = {
+                'perder': 'Pérdida de peso',
+                'ganar': 'Ganancia muscular',
+                'resistencia': 'Aumentar resistencia',
+                'flexibilidad': 'Mejorar flexibilidad',
+                'tonificar': 'Tonificar cuerpo',
+                'mantener': 'Mantener salud general'
+            };
+            return objetivos[objetivo] || objetivo;
+        }
+
+        // Generar rutina
+        function generarRutina() {
+            if (!appData.perfil.objetivo) {
+                alert('Por favor, primero completa tu perfil en la pestaña "Perfil"');
+                return;
+            }
+
+            const frecuencia = parseInt(document.getElementById('frecuencia').value);
+            const duracion = parseInt(document.getElementById('duracion').value);
+            const dificultad = document.getElementById('dificultad').value;
+            const tipoEjercicio = document.getElementById('tipoEjercicio').value;
+
+            if (!frecuencia || !duracion || !dificultad) {
+                alert('Por favor, completa todos los campos');
+                return;
+            }
+
+            appData.rutina = { frecuencia, duracion, dificultad, tipo: tipoEjercicio, ejercicios: [] };
+
+            // Determinar tipos de ejercicio según objetivo
+            let tiposEjercicio = [];
+            if (tipoEjercicio === 'mixto') {
+                switch (appData.perfil.objetivo) {
+                    case 'perder':
+                        tiposEjercicio = ['cardio', 'cardio', 'fuerza'];
+                        break;
+                    case 'ganar':
+                        tiposEjercicio = ['fuerza', 'fuerza', 'cardio'];
+                        break;
+                    case 'resistencia':
+                        tiposEjercicio = ['cardio', 'cardio', 'flexibilidad'];
+                        break;
+                    case 'flexibilidad':
+                        tiposEjercicio = ['flexibilidad', 'flexibilidad', 'cardio'];
+                        break;
+                    case 'tonificar':
+                        tiposEjercicio = ['fuerza', 'cardio', 'flexibilidad'];
+                        break;
+                    default:
+                        tiposEjercicio = ['cardio', 'fuerza', 'flexibilidad'];
+                }
+            } else {
+                tiposEjercicio = [tipoEjercicio, tipoEjercicio, tipoEjercicio];
+            }
+
+            // Generar ejercicios para cada día
+            const ejercicios = [];
+            for (let i = 0; i < frecuencia; i++) {
+                const tipoDelDia = tiposEjercicio[i % tiposEjercicio.length];
+                const ejerciciosDisponibles = ejerciciosDB[tipoDelDia][dificultad];
+                const ejercicioAleatorio = ejerciciosDisponibles[Math.floor(Math.random() * ejerciciosDisponibles.length)];
+                
+                ejercicios.push({
+                    dia: i + 1,
+                    tipo: tipoDelDia,
+                    ...ejercicioAleatorio
+                });
+            }
+
+            appData.rutina.ejercicios = ejercicios;
+
+            // Mostrar rutina
+            mostrarRutina(ejercicios);
+        }
+
+        function mostrarRutina(ejercicios) {
+            const container = document.getElementById('listaEjercicios');
+            container.innerHTML = ejercicios.map((ej, index) => `
+                <div class="exercise-item">
+                    <div class="exercise-info">
+                        <h4>Día ${ej.dia}: ${ej.nombre}</h4>
+                        <div class="exercise-details">
+                            <span>⏱️ ${ej.duracion} min</span> | 
+                            <span>🔥 ${ej.calorias} kcal</span> | 
+                            <span>📋 ${ej.descripcion}</span>
+                        </div>
+                    </div>
+                    <div>
+                        <span style="background: var(--primary); color: white; padding: 5px 15px; border-radius: 20px; font-size: 0.8em;">
+                            ${ej.tipo.toUpperCase()}
+                        </span>
+                    </div>
+                </div>
+            `).join('');
+
+            document.getElementById('rutinaGenerada').classList.remove('hidden');
+        }
+
+        // Diario de entrenamientos
+        function registrarEntrenamiento() {
+            const tipo = document.getElementById('diarioTipo').value;
+            const duracion = parseInt(document.getElementById('diarioDuracion').value);
+            const intensidad = document.getElementById('diarioIntensidad').value;
+            const notas = document.getElementById('diarioNotas').value;
+
+            if (!duracion) {
+                alert('Por favor, ingresa la duración del entrenamiento');
+                return;
+            }
+
+            // Calcular calorías aproximadas
+            const factorIntensidad = { baja: 3, media: 5, alta: 8 };
+            const calorias = duracion * factorIntensidad[intensidad];
+
+            const entrenamiento = {
+                fecha: new Date().toLocaleDateString(),
+                hora: new Date().toLocaleTimeString(),
+                tipo,
+                duracion,
+                intensidad,
+                notas,
+                calorias
+            };
+
+            appData.progreso.entrenamientos.push(entrenamiento);
+            appData.progreso.totalCalorias += calorias;
+
+            // Limpiar formulario
+            document.getElementById('diarioDuracion').value = '';
+            document.getElementById('diarioNotas').value = '';
+
+            alert('✅ Entrenamiento registrado exitosamente');
+            mostrarHistorialEntrenamientos();
+        }
+
+        function mostrarHistorialEntrenamientos() {
+            const container = document.getElementById('historialEntrenamientos');
+            const entrenamientos = appData.progreso.entrenamientos.slice().reverse();
+
+            if (entrenamientos.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: var(--text-light);">No hay entrenamientos registrados aún</p>';
+                return;
+            }
+
+            container.innerHTML = entrenamientos.map(e => `
+                <div class="diary-entry">
+                    <div class="diary-header">
+                        <span class="diary-date">${e.fecha} - ${e.hora}</span>
+                        <span style="background: var(--secondary); color: white; padding: 3px 12px; border-radius: 15px; font-size: 0.8em;">
+                            ${e.tipo.toUpperCase()}
+                        </span>
+                    </div>
+                    <p><strong>Duración:</strong> ${e.duracion} min | <strong>Intensidad:</strong> ${e.intensidad} | <strong>Calorías:</strong> ${e.calorias} kcal</p>
+                    ${e.notas ? `<p style="margin-top: 10px; font-style: italic;">"${e.notas}"</p>` : ''}
+                </div>
+            `).join('');
+        }
+
+        // Nutrición
+        function actualizarNutricion() {
+            // Mostrar consejo aleatorio
+            const consejoAleatorio = consejosNutricion[Math.floor(Math.random() * consejosNutricion.length)];
+            document.getElementById('consejoNutricion').textContent = consejoAleatorio;
+
+            // Calcular agua recomendada
+            if (appData.perfil.peso) {
+                const aguaBase = appData.perfil.peso * 0.035; // 35ml por kg
+                const factorActividad = {
+                    sedentario: 1,
+                    moderado: 1.2,
+                    activo: 1.4
+                };
+                const aguaTotal = (aguaBase * (factorActividad[appData.perfil.nivelActividad] || 1)).toFixed(1);
+                document.getElementById('aguaDiaria').textContent = aguaTotal;
+            }
+
+            // Recomendaciones nutricionales según objetivo
+            mostrarRecomendacionesNutricionales();
+            mostrarAlimentosRecomendados();
+        }
+
+        function mostrarRecomendacionesNutricionales() {
+            const recomendaciones = {
+                'perder': {
+                    calorias: 'Déficit calórico de 300-500 kcal',
+                    proteinas: '1.6-2g por kg de peso',
+                    carbohidratos: 'Moderados, enfocados en complejos',
+                    grasas: '20-30% de calorías totales',
+                    consejos: 'Prioriza alimentos con alta saciedad y bajo contenido calórico'
+                },
+                'ganar': {
+                    calorias: 'Superávit calórico de 300-500 kcal',
+                    proteinas: '2-2.5g por kg de peso',
+                    carbohidratos: 'Altos, especialmente post-entrenamiento',
+                    grasas: '25-35% de calorías totales',
+                    consejos: 'Come frecuentemente y prioriza proteína de calidad'
+                },
+                'resistencia': {
+                    calorias: 'Mantener o ligero superávit',
+                    proteinas: '1.4-1.8g por kg de peso',
+                    carbohidratos: 'Muy altos, principal fuente de energía',
+                    grasas: '20-30% de calorías totales',
+                    consejos: 'Carbohidratos antes y durante entrenamientos largos'
+                },
+                'flexibilidad': {
+                    calorias: 'Mantener peso actual',
+                    proteinas: '1.2-1.6g por kg de peso',
+                    carbohidratos: 'Moderados',
+                    grasas: '25-35% de calorías totales',
+                    consejos: 'Hidratación adecuada y alimentos antiinflamatorios'
+                },
+                'tonificar': {
+                    calorias: 'Mantener o ligero déficit',
+                    proteinas: '1.8-2.2g por kg de peso',
+                    carbohidratos: 'Moderados, timing importante',
+                    grasas: '25-30% de calorías totales',
+                    consejos: 'Balance entre fuerza y cardio en alimentación'
+                },
+                'mantener': {
+                    calorias: 'Mantenimiento',
+                    proteinas: '1.2-1.6g por kg de peso',
+                    carbohidratos: 'Moderados',
+                    grasas: '25-35% de calorías totales',
+                    consejos: 'Alimentación balanceada y variada'
+                }
+            };
+
+            const objetivo = appData.perfil.objetivo;
+            const rec = recomendaciones[objetivo] || recomendaciones['mantener'];
+
+            document.getElementById('recomendacionesNutricionales').innerHTML = `
+                <div class="grid-2">
+                    <div><strong>🎯 Calorías:</strong> ${rec.calorias}</div>
+                    <div><strong>🥩 Proteínas:</strong> ${rec.proteinas}</div>
+                    <div><strong>🍞 Carbohidratos:</strong> ${rec.carbohidratos}</div>
+                    <div><strong>🥑 Grasas:</strong> ${rec.grasas}</div>
+                </div>
+                <div class="alert alert-info" style="margin-top: 15px;">
+                    <strong>💡 Consejo:</strong> ${rec.consejos}
+                </div>
+            `;
+        }
+
+        function mostrarAlimentosRecomendados() {
+            const alimentos = {
+                'perder': ['Verduras de hoja verde', 'Pechuga de pollo', 'Pescado blanco', 'Claras de huevo', 'Avena', 'Frutas bajas en azúcar', 'Yogur griego', 'Legumbres'],
+                'ganar': ['Carnes rojas magras', 'Salmón', 'Huevos enteros', 'Arroz integral', 'Pasta', 'Frutos secos', 'Aguacate', 'Batidos proteicos'],
+                'resistencia': ['Plátanos', 'Pasta integral', 'Arroz', 'Batata', 'Pan integral', 'Frutas secas', 'Miel', 'Geles energéticos'],
+                'flexibilidad': ['Pescado azul', 'Frutos rojos', 'Cúrcuma', 'Jengibre', 'Nueces', 'Aceite de oliva', 'Té verde', 'Verduras de colores'],
+                'tonificar': ['Pechuga de pavo', 'Atún', 'Quinoa', 'Brócoli', 'Espinacas', 'Claras de huevo', 'Batata', 'Proteína whey'],
+                'mantener': ['Variedad de proteínas', 'Granos enteros', 'Frutas variadas', 'Vegetales diversos', 'Grasas saludables', 'Lácteos bajos en grasa']
+            };
+
+            const objetivo = appData.perfil.objetivo;
+            const lista = alimentos[objetivo] || alimentos['mantener'];
+
+            document.getElementById('alimentosRecomendados').innerHTML = `
+                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px;">
+                    ${lista.map(alimento => `
+                        <div style="background: white; padding: 12px; border-radius: 8px; text-align: center; border: 2px solid var(--border);">
+                            ${alimento}
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        // Resumen
+        function actualizarResumen() {
+            mostrarResumenSemanal();
+            mostrarObjetivosLogros();
+            mostrarRecomendacionesMejora();
+        }
+
+        function mostrarResumenSemanal() {
+            const ultimaSemana = appData.progreso.entrenamientos.slice(-7);
+            const totalDuracion = ultimaSemana.reduce((sum, e) => sum + e.duracion, 0);
+            const totalCalorias = ultimaSemana.reduce((sum, e) => sum + e.calorias, 0);
+            const dias = ultimaSemana.length;
+
+            document.getElementById('resumenSemanal').innerHTML = `
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-label">Entrenamientos</div>
+                        <div class="stat-value">${dias}</div>
+                        <div class="stat-label">esta semana</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Tiempo Total</div>
+                        <div class="stat-value">${totalDuracion}</div>
+                        <div class="stat-label">minutos</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Calorías</div>
+                        <div class="stat-value">${totalCalorias}</div>
+                        <div class="stat-label">kcal quemadas</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Promedio</div>
+                        <div class="stat-value">${dias > 0 ? Math.round(totalDuracion / dias) : 0}</div>
+                        <div class="stat-label">min por sesión</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function mostrarObjetivosLogros() {
+            const entrenamientos = appData.progreso.entrenamientos.length;
+            const calorias = appData.progreso.totalCalorias;
+            
+            const logros = [];
+            if (entrenamientos >= 5) logros.push('🏅 5 entrenamientos completados');
+            if (entrenamientos >= 10) logros.push('🏅 10 entrenamientos completados');
+            if (entrenamientos >= 25) logros.push('🏆 25 entrenamientos completados');
+            if (entrenamientos >= 50) logros.push('🏆 ¡50 entrenamientos! Increíble');
+            if (calorias >= 1000) logros.push('🔥 1000 calorías quemadas');
+            if (calorias >= 5000) logros.push('🔥 5000 calorías quemadas');
+            if (calorias >= 10000) logros.push('🔥🔥 ¡10000 calorías!');
+
+            const historialPeso = appData.progreso.historialPeso;
+            if (historialPeso.length >= 2) {
+                const pesoInicial = historialPeso[0].peso;
+                const pesoActual = historialPeso[historialPeso.length - 1].peso;
+                const diferencia = pesoInicial - pesoActual;
+                
+                if (diferencia > 1) logros.push(`📉 Has perdido ${diferencia.toFixed(1)} kg`);
+                if (diferencia < -1) logros.push(`📈 Has ganado ${Math.abs(diferencia).toFixed(1)} kg`);
+            }
+
+            document.getElementById('objetivosLogros').innerHTML = `
+                <div class="alert alert-success">
+                    <strong>🎯 Tu Objetivo Actual:</strong> ${obtenerTextoObjetivo(appData.perfil.objetivo)}
+                </div>
+                <h4 style="margin: 20px 0 10px 0;">🏆 Logros Obtenidos</h4>
+                ${logros.length > 0 ? `
+                    <div style="display: grid; gap: 10px;">
+                        ${logros.map(logro => `
+                            <div class="alert alert-success" style="margin: 0;">
+                                ${logro}
+                            </div>
+                        `).join('')}
+                    </div>
+                ` : '<p style="text-align: center; color: var(--text-light);">Completa entrenamientos para desbloquear logros</p>'}
+            `;
+        }
+
+        function mostrarRecomendacionesMejora() {
+            const recomendaciones = [];
+            const entrenamientos = appData.progreso.entrenamientos;
+            const ultimaSemana = entrenamientos.slice(-7);
+
+            // Análisis de consistencia
+            if (ultimaSemana.length < 3 && appData.rutina.frecuencia > 3) {
+                recomendaciones.push('📅 Intenta ser más consistente con tus entrenamientos. Tu meta es ' + appData.rutina.frecuencia + ' días por semana.');
+            }
+
+            // Análisis de variedad
+            const tipos = new Set(ultimaSemana.map(e => e.tipo));
+            if (tipos.size === 1 && ultimaSemana.length > 3) {
+                recomendaciones.push('🔄 Agrega variedad a tus entrenamientos. Combinar diferentes tipos de ejercicio da mejores resultados.');
+            }
+
+            // Recomendaciones según objetivo
+            if (appData.perfil.objetivo === 'perder' && ultimaSemana.filter(e => e.tipo === 'cardio').length < 2) {
+                recomendaciones.push('🏃 Para pérdida de peso, intenta hacer más ejercicios cardiovasculares.');
+            }
+
+            if (appData.perfil.objetivo === 'ganar' && ultimaSemana.filter(e => e.tipo === 'fuerza').length < 3) {
+                recomendaciones.push('💪 Para ganancia muscular, enfócate más en ejercicios de fuerza.');
+            }
+
+            // Recomendación de descanso
+            if (entrenamientos.length > 0) {
+                const ultimoEntrenamiento = new Date(entrenamientos[entrenamientos.length - 1].fecha);
+                const hoy = new Date();
+                const diasDesdeUltimo = Math.floor((hoy - ultimoEntrenamiento) / (1000 * 60 * 60 * 24));
+                
+                if (diasDesdeUltimo > 3) {
+                    recomendaciones.push('⏰ Han pasado ' + diasDesdeUltimo + ' días desde tu último entrenamiento. ¡Es hora de volver!');
+                }
+            }
+
+            if (recomendaciones.length === 0) {
+                recomendaciones.push('✅ ¡Excelente trabajo! Sigue así y alcanzarás tus objetivos.');
+                recomendaciones.push('💧 No olvides mantener una buena hidratación.');
+                recomendaciones.push('😴 El descanso es tan importante como el ejercicio.');
+            }
+
+            document.getElementById('recomendacionesMejora').innerHTML = recomendaciones.map(rec => `
+                <div class="alert alert-info" style="margin-bottom: 10px;">
+                    ${rec}
+                </div>
+            `).join('');
+        }
+
+        function ajustarObjetivo() {
+            const nuevoObjetivo = document.getElementById('nuevoObjetivo').value;
+            
+            if (!nuevoObjetivo) {
+                alert('Por favor, selecciona un nuevo objetivo');
+                return;
+            }
+
+            appData.perfil.objetivo = nuevoObjetivo;
+            alert('✅ Objetivo actualizado: ' + obtenerTextoObjetivo(nuevoObjetivo));
+            actualizarResumen();
+        }
+
+        // Función para limpiar datos de ejemplo
+        function limpiarDatosEjemplo() {
+            if (!confirm('¿Estás seguro de que quieres eliminar todos los datos de ejemplo y empezar de cero?')) {
+                return;
+            }
+
+            // Resetear datos
+            appData = {
+                perfil: {
+                    edad: null,
+                    sexo: null,
+                    peso: null,
+                    altura: null,
+                    nivelActividad: null,
+                    objetivo: null
+                },
+                rutina: {
+                    frecuencia: null,
+                    duracion: null,
+                    dificultad: null,
+                    tipo: null,
+                    ejercicios: []
+                },
+                progreso: {
+                    historialPeso: [],
+                    entrenamientos: [],
+                    totalCalorias: 0
+                }
+            };
+
+            // Limpiar formularios
+            document.getElementById('edad').value = '';
+            document.getElementById('sexo').value = '';
+            document.getElementById('peso').value = '';
+            document.getElementById('altura').value = '';
+            document.getElementById('nivelActividad').value = '';
+            document.getElementById('objetivo').value = '';
+
+            // Ocultar resultado IMC
+            document.getElementById('imcResultado').classList.add('hidden');
+
+            // Actualizar vistas
+            mostrarHistorialEntrenamientos();
+
+            alert('✅ Datos de ejemplo eliminados. Puedes empezar con tu propia información.');
+        }
+
+        // Inicialización
+        window.addEventListener('load', () => {
+            // Cargar datos de ejemplo en el formulario de perfil
+            document.getElementById('edad').value = appData.perfil.edad;
+            document.getElementById('sexo').value = appData.perfil.sexo;
+            document.getElementById('peso').value = appData.perfil.peso;
+            document.getElementById('altura').value = appData.perfil.altura;
+            document.getElementById('nivelActividad').value = appData.perfil.nivelActividad;
+            document.getElementById('objetivo').value = appData.perfil.objetivo;
+
+            // Mostrar IMC inicial
+            const imc = calcularIMC(appData.perfil.peso, appData.perfil.altura);
+            const clasificacion = clasificarIMC(imc);
+            const resultadoDiv = document.getElementById('imcResultado');
+            resultadoDiv.className = `card imc-${clasificacion.clase}`;
+            resultadoDiv.innerHTML = `
+                <h3>✅ Perfil de Ejemplo Cargado</h3>
+                <p><strong>Tu IMC:</strong> ${imc}</p>
+                <p><strong>Clasificación:</strong> ${clasificacion.texto}</p>
+                <p><strong>Objetivo:</strong> ${obtenerTextoObjetivo(appData.perfil.objetivo)}</p>
+                <p style="margin-top: 10px; color: var(--text-light); font-size: 0.9em;">💡 Estos son datos de ejemplo. Puedes modificarlos y guardar tu propio perfil.</p>
+            `;
+            resultadoDiv.classList.remove('hidden');
+
+            // Mostrar consejo inicial
+            const consejoInicial = consejosNutricion[Math.floor(Math.random() * consejosNutricion.length)];
+            document.getElementById('consejoNutricion').textContent = consejoInicial;
+
+            // Mostrar mensaje de bienvenida
+            console.log('🏋️ Simulador de Ejercicio y Salud cargado con datos de ejemplo');
+        });
+    </script>
+</body>
+</html>
